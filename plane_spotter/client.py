@@ -21,7 +21,9 @@ class ADSBClient:
             self._http = httpx.AsyncClient(timeout=httpx.Timeout(10.0))
         return self._http
 
-    async def fetch_nearby(self, lat: float, lon: float, radius_nm: float) -> list[Aircraft]:
+    async def fetch_nearby(
+        self, lat: float, lon: float, radius_nm: float
+    ) -> list[Aircraft]:
         """Fetch aircraft within the given radius of a position.
 
         Returns only aircraft that have valid position data.
@@ -44,13 +46,19 @@ class ADSBClient:
             raise
 
         data = response.json()
-        logger.debug("Response status %d, %d aircraft in payload", response.status_code, data.get("resultCount", 0))
+        logger.debug(
+            "Response status %d, %d aircraft in payload",
+            response.status_code,
+            data.get("resultCount", 0),
+        )
 
         raw_aircraft = data.get("aircraft", [])
         aircraft = [Aircraft.from_api_response(ac) for ac in raw_aircraft]
         aircraft = [ac for ac in aircraft if ac.has_position]
 
-        logger.info("Fetched %d aircraft (%d with position)", len(raw_aircraft), len(aircraft))
+        logger.info(
+            "Fetched %d aircraft (%d with position)", len(raw_aircraft), len(aircraft)
+        )
         return aircraft
 
     async def close(self) -> None:

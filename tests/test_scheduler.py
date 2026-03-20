@@ -57,7 +57,9 @@ class TestPollScheduler:
         assert scheduler.current_interval == 120.0
 
     def test_custom_intervals(self):
-        scheduler = PollScheduler(base_interval=180, elevated_interval=90, high_interval=45)
+        scheduler = PollScheduler(
+            base_interval=180, elevated_interval=90, high_interval=45
+        )
         tracker = _mock_tracker(has_approaching=True, min_time_to_cpa=10.0)
         interval = scheduler.get_interval(tracker)
         assert interval == 45.0

@@ -56,7 +56,9 @@ class PollScheduler:
         if self._current != previous:
             logger.info(
                 "Poll interval changed: %.0fs → %.0fs (%s)",
-                previous, self._current, reason,
+                previous,
+                self._current,
+                reason,
             )
         else:
             logger.debug("Poll interval unchanged: %.0fs (%s)", self._current, reason)

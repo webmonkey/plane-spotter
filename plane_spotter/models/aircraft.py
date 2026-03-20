@@ -27,8 +27,12 @@ class Aircraft:
             flight=(data.get("flight") or "").strip() or None,
             registration=data.get("r"),
             aircraft_type=data.get("t"),
-            alt_baro=data.get("alt_baro") if isinstance(data.get("alt_baro"), int) else None,
-            alt_geom=data.get("alt_geom") if isinstance(data.get("alt_geom"), int) else None,
+            alt_baro=data.get("alt_baro")
+            if isinstance(data.get("alt_baro"), int)
+            else None,
+            alt_geom=data.get("alt_geom")
+            if isinstance(data.get("alt_geom"), int)
+            else None,
             ground_speed=data.get("gs"),
             track=data.get("track"),
             lat=data.get("lat"),

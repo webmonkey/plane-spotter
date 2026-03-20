@@ -26,7 +26,10 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dlat = lat2_r - lat1_r
     dlon = lon2_r - lon1_r
 
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1_r) * math.cos(lat2_r) * math.sin(dlon / 2) ** 2
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(lat1_r) * math.cos(lat2_r) * math.sin(dlon / 2) ** 2
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     return EARTH_RADIUS_NM * c
@@ -40,7 +43,9 @@ def bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dlon = lon2_r - lon1_r
 
     x = math.sin(dlon) * math.cos(lat2_r)
-    y = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(dlon)
+    y = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(
+        lat2_r
+    ) * math.cos(dlon)
 
     return _rad_to_deg(math.atan2(x, y)) % 360
 

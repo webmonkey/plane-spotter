@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from .geometry import closest_point_of_approach, is_approaching, time_to_closest_approach
+from .geometry import (
+    closest_point_of_approach,
+    is_approaching,
+    time_to_closest_approach,
+)
 from .models import Aircraft, EventType, TrackingEvent, TrackingStatus
 
 logger = logging.getLogger(__name__)
@@ -47,7 +51,9 @@ class PlaneTracker:
         return self._tracked
 
     def has_approaching(self) -> bool:
-        return any(t.status == TrackingStatus.APPROACHING for t in self._tracked.values())
+        return any(
+            t.status == TrackingStatus.APPROACHING for t in self._tracked.values()
+        )
 
     def has_nearby(self) -> bool:
         return any(t.status == TrackingStatus.NEARBY for t in self._tracked.values())
@@ -74,7 +80,9 @@ class PlaneTracker:
             if ac.alt_baro > self._altitude_threshold:
                 logger.debug(
                     "%s filtered: alt_baro %d > threshold %d",
-                    ac.callsign, ac.alt_baro, self._altitude_threshold,
+                    ac.callsign,
+                    ac.alt_baro,
+                    self._altitude_threshold,
                 )
                 continue
 
@@ -89,26 +97,49 @@ class PlaneTracker:
                 if status == TrackingStatus.APPROACHING:
                     logger.info(
                         "%s NEW_APPROACH — CPA %.2fnm, ETA %.0fs, alt %s ft",
-                        ac.callsign, cpa_nm or 0, time_cpa_s or 0, ac.alt_baro,
+                        ac.callsign,
+                        cpa_nm or 0,
+                        time_cpa_s or 0,
+                        ac.alt_baro,
                     )
-                    events.append(TrackingEvent(EventType.NEW_APPROACH, ac, cpa_nm, time_cpa_s))
+                    events.append(
+                        TrackingEvent(EventType.NEW_APPROACH, ac, cpa_nm, time_cpa_s)
+                    )
             else:
                 if status == TrackingStatus.APPROACHING:
                     if prev.status == TrackingStatus.APPROACHING:
                         logger.debug(
                             "%s STILL_APPROACHING — CPA %.2fnm, ETA %.0fs",
-                            ac.callsign, cpa_nm or 0, time_cpa_s or 0,
+                            ac.callsign,
+                            cpa_nm or 0,
+                            time_cpa_s or 0,
                         )
-                        events.append(TrackingEvent(EventType.STILL_APPROACHING, ac, cpa_nm, time_cpa_s))
+                        events.append(
+                            TrackingEvent(
+                                EventType.STILL_APPROACHING, ac, cpa_nm, time_cpa_s
+                            )
+                        )
                     else:
                         logger.info(
                             "%s NEW_APPROACH (was %s) — CPA %.2fnm, ETA %.0fs, alt %s ft",
-                            ac.callsign, prev.status.name, cpa_nm or 0, time_cpa_s or 0, ac.alt_baro,
+                            ac.callsign,
+                            prev.status.name,
+                            cpa_nm or 0,
+                            time_cpa_s or 0,
+                            ac.alt_baro,
                         )
-                        events.append(TrackingEvent(EventType.NEW_APPROACH, ac, cpa_nm, time_cpa_s))
+                        events.append(
+                            TrackingEvent(
+                                EventType.NEW_APPROACH, ac, cpa_nm, time_cpa_s
+                            )
+                        )
                 elif prev.status == TrackingStatus.APPROACHING:
-                    logger.info("%s PASSED — no longer on approaching track", ac.callsign)
-                    events.append(TrackingEvent(EventType.PASSED, ac, cpa_nm, time_cpa_s))
+                    logger.info(
+                        "%s PASSED — no longer on approaching track", ac.callsign
+                    )
+                    events.append(
+                        TrackingEvent(EventType.PASSED, ac, cpa_nm, time_cpa_s)
+                    )
 
             self._tracked[ac.hex] = TrackedAircraft(ac, status, cpa_nm, time_cpa_s)
 
@@ -120,11 +151,15 @@ class PlaneTracker:
                 logger.info("%s DEPARTED while approaching", prev.aircraft.callsign)
                 events.append(TrackingEvent(EventType.DEPARTED, prev.aircraft))
             else:
-                logger.debug("%s departed (was %s)", prev.aircraft.callsign, prev.status.name)
+                logger.debug(
+                    "%s departed (was %s)", prev.aircraft.callsign, prev.status.name
+                )
 
         return events
 
-    def _classify(self, ac: Aircraft) -> tuple[TrackingStatus | None, float | None, float | None]:
+    def _classify(
+        self, ac: Aircraft
+    ) -> tuple[TrackingStatus | None, float | None, float | None]:
         """Classify an aircraft's status relative to the user."""
         if not ac.has_track or ac.lat is None or ac.lon is None:
             logger.debug("%s has missing track data, skipping", ac.callsign)
@@ -133,18 +168,29 @@ class PlaneTracker:
         assert ac.track is not None
         assert ac.ground_speed is not None
 
-        cpa_nm = closest_point_of_approach(ac.lat, ac.lon, ac.track, self._user_lat, self._user_lon)
-        approaching = is_approaching(ac.lat, ac.lon, ac.track, self._user_lat, self._user_lon)
+        cpa_nm = closest_point_of_approach(
+            ac.lat, ac.lon, ac.track, self._user_lat, self._user_lon
+        )
+        approaching = is_approaching(
+            ac.lat, ac.lon, ac.track, self._user_lat, self._user_lon
+        )
 
         time_cpa_s: float | None = None
         if approaching and cpa_nm < self._close_pass_nm:
             time_cpa_s = time_to_closest_approach(
-                ac.lat, ac.lon, ac.track, ac.ground_speed, self._user_lat, self._user_lon,
+                ac.lat,
+                ac.lon,
+                ac.track,
+                ac.ground_speed,
+                self._user_lat,
+                self._user_lon,
             )
 
         logger.debug(
             "%s — CPA %.3fnm, approaching=%s, time_to_cpa=%s",
-            ac.callsign, cpa_nm, approaching,
+            ac.callsign,
+            cpa_nm,
+            approaching,
             f"{time_cpa_s:.0f}s" if time_cpa_s is not None else "N/A",
         )
 
