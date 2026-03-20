@@ -73,6 +73,8 @@ def main(
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
+    logging.getLogger("httpcore.http11").setLevel(logging.INFO)
+    logging.getLogger("httpcore.connection").setLevel(logging.INFO)
 
     client = ADSBClient(base_url=config.api_base_url)
     tracker = PlaneTracker(
