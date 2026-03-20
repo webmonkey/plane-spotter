@@ -127,10 +127,13 @@ class PlaneTracker:
                 if prev is not None and prev.status == TrackingStatus.APPROACHING:
                     # Already confirmed — keep approaching
                     logger.debug(
-                        "%s STILL_APPROACHING — CPA %.2fnm, ETA %.0fs",
+                        "%s STILL_APPROACHING — CPA %.2fnm, ETA %.0fs, lat=%s lon=%s track=%s",
                         ac.callsign,
                         cpa_nm or 0,
                         time_cpa_s or 0,
+                        ac.lat,
+                        ac.lon,
+                        ac.track,
                     )
                     events.append(
                         TrackingEvent(
@@ -143,12 +146,15 @@ class PlaneTracker:
                 elif new_count >= self._confirmation_count:
                     # Enough consecutive observations — promote to APPROACHING
                     logger.info(
-                        "%s NEW_APPROACH (confirmed after %d polls) — CPA %.2fnm, ETA %.0fs, alt %s ft",
+                        "%s NEW_APPROACH (confirmed after %d polls) — CPA %.2fnm, ETA %.0fs, alt %s ft, lat=%s lon=%s track=%s",
                         ac.callsign,
                         new_count,
                         cpa_nm or 0,
                         time_cpa_s or 0,
                         ac.alt_baro,
+                        ac.lat,
+                        ac.lon,
+                        ac.track,
                     )
                     events.append(
                         TrackingEvent(EventType.NEW_APPROACH, ac, cpa_nm, time_cpa_s)
@@ -159,12 +165,15 @@ class PlaneTracker:
                 else:
                     # Not yet confirmed — stay/become CANDIDATE
                     logger.debug(
-                        "%s CANDIDATE (%d/%d) — CPA %.2fnm, ETA %.0fs",
+                        "%s CANDIDATE (%d/%d) — CPA %.2fnm, ETA %.0fs, lat=%s lon=%s track=%s",
                         ac.callsign,
                         new_count,
                         self._confirmation_count,
                         cpa_nm or 0,
                         time_cpa_s or 0,
+                        ac.lat,
+                        ac.lon,
+                        ac.track,
                     )
                     self._tracked[ac.hex] = TrackedAircraft(
                         ac, TrackingStatus.CANDIDATE, cpa_nm, time_cpa_s, new_count
@@ -173,15 +182,22 @@ class PlaneTracker:
                 # Aircraft is NOT on an approaching track this cycle
                 if prev is not None and prev.status == TrackingStatus.APPROACHING:
                     logger.info(
-                        "%s PASSED — no longer on approaching track", ac.callsign
+                        "%s PASSED — no longer on approaching track, lat=%s lon=%s track=%s",
+                        ac.callsign,
+                        ac.lat,
+                        ac.lon,
+                        ac.track,
                     )
                     events.append(
                         TrackingEvent(EventType.PASSED, ac, cpa_nm, time_cpa_s)
                     )
                 elif prev is not None and prev.status == TrackingStatus.CANDIDATE:
                     logger.debug(
-                        "%s candidate cleared — turned away before confirmation",
+                        "%s candidate cleared — turned away before confirmation, lat=%s lon=%s track=%s",
                         ac.callsign,
+                        ac.lat,
+                        ac.lon,
+                        ac.track,
                     )
 
                 self._tracked[ac.hex] = TrackedAircraft(
@@ -193,11 +209,22 @@ class PlaneTracker:
         for hex_code in departed:
             prev = self._tracked.pop(hex_code)
             if prev.status == TrackingStatus.APPROACHING:
-                logger.info("%s DEPARTED while approaching", prev.aircraft.callsign)
+                logger.info(
+                    "%s DEPARTED while approaching, lat=%s lon=%s track=%s",
+                    prev.aircraft.callsign,
+                    prev.aircraft.lat,
+                    prev.aircraft.lon,
+                    prev.aircraft.track,
+                )
                 events.append(TrackingEvent(EventType.DEPARTED, prev.aircraft))
             else:
                 logger.debug(
-                    "%s departed (was %s)", prev.aircraft.callsign, prev.status.name
+                    "%s departed (was %s), lat=%s lon=%s track=%s",
+                    prev.aircraft.callsign,
+                    prev.status.name,
+                    prev.aircraft.lat,
+                    prev.aircraft.lon,
+                    prev.aircraft.track,
                 )
 
         return events
@@ -232,11 +259,14 @@ class PlaneTracker:
             )
 
         logger.debug(
-            "%s — CPA %.3fnm, approaching=%s, time_to_cpa=%s",
+            "%s — CPA %.3fnm, approaching=%s, time_to_cpa=%s, lat=%s lon=%s track=%s",
             ac.callsign,
             cpa_nm,
             approaching,
             f"{time_cpa_s:.0f}s" if time_cpa_s is not None else "N/A",
+            ac.lat,
+            ac.lon,
+            ac.track,
         )
 
         if cpa_nm < self._close_pass_nm and approaching:
