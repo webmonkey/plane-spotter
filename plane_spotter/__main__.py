@@ -49,6 +49,13 @@ from .tracker import PlaneTracker
     help="Consecutive approaching polls required before alerting (default: 3)",
 )
 @click.option(
+    "--ignore-type",
+    "ignored_type_codes",
+    type=str,
+    default=None,
+    help="Comma-separated aircraft type codes to ignore (e.g. 'BALL,ULAC')",
+)
+@click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"], case_sensitive=False),
     default="WARNING",
@@ -61,6 +68,7 @@ def main(
     altitude_threshold_ft: int | None,
     close_pass_nm: float | None,
     confirmation_count: int | None,
+    ignored_type_codes: str | None,
     log_level: str | None,
 ) -> None:
     """Monitor nearby low-altitude aircraft and alert when one is approaching."""
@@ -72,6 +80,7 @@ def main(
             altitude_threshold_ft=altitude_threshold_ft,
             close_pass_nm=close_pass_nm,
             confirmation_count=confirmation_count,
+            ignored_type_codes=ignored_type_codes,
             log_level=log_level,
         )
     except ValueError as exc:
@@ -92,6 +101,7 @@ def main(
         altitude_threshold_ft=config.altitude_threshold_ft,
         close_pass_nm=config.close_pass_nm,
         confirmation_count=config.confirmation_count,
+        ignored_type_codes=config.ignored_type_codes,
     )
     scheduler = PollScheduler()
     notifier = ConsoleNotifier()

@@ -48,12 +48,14 @@ class PlaneTracker:
         altitude_threshold_ft: int = 3000,
         close_pass_nm: float = 0.5,
         confirmation_count: int = 3,
+        ignored_type_codes: frozenset[str] = frozenset(),
     ) -> None:
         self._user_lat = user_lat
         self._user_lon = user_lon
         self._altitude_threshold = altitude_threshold_ft
         self._close_pass_nm = close_pass_nm
         self._confirmation_count = confirmation_count
+        self._ignored_type_codes = ignored_type_codes
         self._tracked: dict[str, TrackedAircraft] = {}
 
     @property
@@ -96,6 +98,18 @@ class PlaneTracker:
                     ac.callsign,
                     ac.alt_baro,
                     self._altitude_threshold,
+                )
+                continue
+
+            if (
+                self._ignored_type_codes
+                and ac.aircraft_type
+                and ac.aircraft_type in self._ignored_type_codes
+            ):
+                logger.debug(
+                    "%s filtered: type code %s is ignored",
+                    ac.callsign,
+                    ac.aircraft_type,
                 )
                 continue
 

@@ -308,3 +308,66 @@ class TestPlaneTracker:
         events = tracker.update([])  # disappears
         departed = [e for e in events if e.event_type == EventType.DEPARTED]
         assert len(departed) == 1
+
+    # ---- Ignored type code tests ----
+
+    def test_ignored_type_code_filtered(self):
+        """Aircraft with an ignored type code should be completely filtered out."""
+        tracker = self._make_tracker(ignored_type_codes=frozenset({"BALL", "ULAC"}))
+        ac = _make_aircraft(
+            hex="a1",
+            lat=51.45,
+            lon=-0.142,
+            track=0.0,
+            ground_speed=100.0,
+            alt_baro=2000,
+            aircraft_type="BALL",
+        )
+        events = tracker.update([ac])
+        assert len(events) == 0
+        assert "a1" not in tracker.tracked
+
+    def test_ignored_type_code_does_not_affect_others(self):
+        """Aircraft with a non-ignored type code should still be tracked."""
+        tracker = self._make_tracker(ignored_type_codes=frozenset({"BALL"}))
+        ac = _make_aircraft(
+            hex="a1",
+            lat=51.45,
+            lon=-0.142,
+            track=0.0,
+            ground_speed=100.0,
+            alt_baro=2000,
+            aircraft_type="C172",
+        )
+        events = tracker.update([ac])
+        assert "a1" in tracker.tracked
+
+    def test_ignored_type_code_none_type_still_tracked(self):
+        """Aircraft with no type code should not be filtered by ignored list."""
+        tracker = self._make_tracker(ignored_type_codes=frozenset({"BALL"}))
+        ac = _make_aircraft(
+            hex="a1",
+            lat=51.45,
+            lon=-0.142,
+            track=0.0,
+            ground_speed=100.0,
+            alt_baro=2000,
+            aircraft_type=None,
+        )
+        events = tracker.update([ac])
+        assert "a1" in tracker.tracked
+
+    def test_empty_ignored_type_codes_no_filtering(self):
+        """An empty ignored set should not filter any aircraft."""
+        tracker = self._make_tracker(ignored_type_codes=frozenset())
+        ac = _make_aircraft(
+            hex="a1",
+            lat=51.45,
+            lon=-0.142,
+            track=0.0,
+            ground_speed=100.0,
+            alt_baro=2000,
+            aircraft_type="BALL",
+        )
+        events = tracker.update([ac])
+        assert "a1" in tracker.tracked

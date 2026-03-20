@@ -14,6 +14,7 @@ class Config:
     altitude_threshold_ft: int = 3000
     close_pass_nm: float = 0.5
     confirmation_count: int = 3
+    ignored_type_codes: frozenset[str] = frozenset()
     api_base_url: str = "https://re-api.adsb.lol/"
     log_level: str = "INFO"
 
@@ -55,6 +56,16 @@ class Config:
             close_pass_nm=_get("close_pass_nm", "PLANE_SPOTTER_CLOSE_PASS", float, 0.5),
             confirmation_count=_get(
                 "confirmation_count", "PLANE_SPOTTER_CONFIRMATION_COUNT", int, 3
+            ),
+            ignored_type_codes=frozenset(
+                code.strip()
+                for code in _get(
+                    "ignored_type_codes",
+                    "PLANE_SPOTTER_IGNORED_TYPE_CODES",
+                    str,
+                    "",
+                ).split(",")
+                if code.strip()
             ),
             api_base_url=_get(
                 "api_base_url", "PLANE_SPOTTER_API_URL", str, "https://re-api.adsb.lol/"

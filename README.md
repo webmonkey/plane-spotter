@@ -36,6 +36,8 @@ docker run --rm -e PLANE_SPOTTER_LAT=51.501 -e PLANE_SPOTTER_LON=-0.142 plane-sp
 | `--radius` | `PLANE_SPOTTER_RADIUS` | 5 | Search radius in nautical miles |
 | `--altitude-threshold` | `PLANE_SPOTTER_ALTITUDE_THRESHOLD` | 3000 | Max altitude in feet |
 | `--close-pass-distance` | `PLANE_SPOTTER_CLOSE_PASS` | 0.5 | Close pass threshold in nm |
+| `--confirmation-count` | `PLANE_SPOTTER_CONFIRMATION_COUNT` | 3 | Consecutive approaching polls before alerting |
+| `--ignore-type` | `PLANE_SPOTTER_IGNORED_TYPE_CODES` | | Comma-separated aircraft type codes to ignore (e.g. `BALL,ULAC`) |
 | `--log-level` | `PLANE_SPOTTER_LOG_LEVEL` | INFO | Log level (DEBUG, INFO, WARNING, ERROR) |
 
 ## Running without Docker
