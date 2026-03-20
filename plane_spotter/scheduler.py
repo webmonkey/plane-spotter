@@ -46,7 +46,7 @@ class PollScheduler:
             else:
                 self._current = self._elevated
                 reason = "aircraft on approaching track"
-        elif tracker.has_nearby():
+        elif tracker.has_candidate() or tracker.has_nearby():
             self._current = self._elevated
             reason = "low-altitude aircraft nearby"
         else:

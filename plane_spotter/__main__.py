@@ -42,6 +42,13 @@ from .tracker import PlaneTracker
     help="Close pass distance in nm (default: 0.5)",
 )
 @click.option(
+    "--confirmation-count",
+    "confirmation_count",
+    type=int,
+    default=None,
+    help="Consecutive approaching polls required before alerting (default: 3)",
+)
+@click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"], case_sensitive=False),
     default="WARNING",
@@ -53,6 +60,7 @@ def main(
     radius_nm: float | None,
     altitude_threshold_ft: int | None,
     close_pass_nm: float | None,
+    confirmation_count: int | None,
     log_level: str | None,
 ) -> None:
     """Monitor nearby low-altitude aircraft and alert when one is approaching."""
@@ -63,6 +71,7 @@ def main(
             radius_nm=radius_nm,
             altitude_threshold_ft=altitude_threshold_ft,
             close_pass_nm=close_pass_nm,
+            confirmation_count=confirmation_count,
             log_level=log_level,
         )
     except ValueError as exc:
@@ -82,6 +91,7 @@ def main(
         user_lon=config.lon,
         altitude_threshold_ft=config.altitude_threshold_ft,
         close_pass_nm=config.close_pass_nm,
+        confirmation_count=config.confirmation_count,
     )
     scheduler = PollScheduler()
     notifier = ConsoleNotifier()

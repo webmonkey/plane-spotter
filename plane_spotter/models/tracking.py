@@ -10,6 +10,7 @@ class TrackingStatus(Enum):
     """Classification of an aircraft relative to the user's position."""
 
     APPROACHING = auto()
+    CANDIDATE = auto()
     NEARBY = auto()
     GONE = auto()
 

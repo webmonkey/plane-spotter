@@ -13,6 +13,7 @@ class Config:
     radius_nm: float = 5.0
     altitude_threshold_ft: int = 3000
     close_pass_nm: float = 0.5
+    confirmation_count: int = 3
     api_base_url: str = "https://re-api.adsb.lol/"
     log_level: str = "INFO"
 
@@ -52,6 +53,9 @@ class Config:
                 "altitude_threshold_ft", "PLANE_SPOTTER_ALTITUDE_THRESHOLD", int, 3000
             ),
             close_pass_nm=_get("close_pass_nm", "PLANE_SPOTTER_CLOSE_PASS", float, 0.5),
+            confirmation_count=_get(
+                "confirmation_count", "PLANE_SPOTTER_CONFIRMATION_COUNT", int, 3
+            ),
             api_base_url=_get(
                 "api_base_url", "PLANE_SPOTTER_API_URL", str, "https://re-api.adsb.lol/"
             ),

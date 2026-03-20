@@ -10,11 +10,13 @@ from plane_spotter.tracker import PlaneTracker, TrackedAircraft
 def _mock_tracker(
     has_approaching: bool = False,
     has_nearby: bool = False,
+    has_candidate: bool = False,
     min_time_to_cpa: float | None = None,
 ) -> PlaneTracker:
     tracker = MagicMock(spec=PlaneTracker)
     tracker.has_approaching.return_value = has_approaching
     tracker.has_nearby.return_value = has_nearby
+    tracker.has_candidate.return_value = has_candidate
     tracker.min_time_to_cpa.return_value = min_time_to_cpa
     return tracker
 
